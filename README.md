@@ -11,6 +11,17 @@ this [Makefile](Makefile) creates a slim `preseed.cfg` with just differences to 
 fine-tune a rebuild.
 the easiest way to apply the `preseed.cfg` is to put it in the root directory of a USB installer.
 
+## Setup
+
+the host requires some additional configuration, execute these on the host:
+
+```bash
+su - # enter root password
+apt install -y debconf-utils openssh-server
+echo '%users ALL=(root) NOPASSWD: /usr/bin/debconf-get-selections' > /etc/sudoers.d/debconf-get-selections
+exit
+```
+
 ## Secrets
 
 note that passwords are not retrieved by this process, rather placeholders
