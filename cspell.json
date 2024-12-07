@@ -13,5 +13,8 @@
             // personal dictionary.
             "addWords": false
         }
-    ]
+    ],
+
+    // Ignore these paths
+    "ignorePaths": ["**/*.txt", "**/*.cfg"]
 }
