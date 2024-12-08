@@ -1,4 +1,0 @@
-debconf
-distclean
-NOPASSWD
-preseed
