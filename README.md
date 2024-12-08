@@ -9,11 +9,10 @@ recreates the system **after** install but the harder part to get to is the init
 this [Makefile](Makefile) creates a slim `preseed.cfg` with just differences to a
 [well-known basis](https://preseed.debian.net/debian-preseed/), which can be further tweaked to
 fine-tune a rebuild.
-the easiest way to apply the `preseed.cfg` is to put it in the root directory of a USB installer.
 
 ## Setup
 
-the host requires some additional configuration, execute these on the host:
+the target requires some additional configuration, execute these on the host:
 
 ```bash
 su - # enter root password
@@ -41,3 +40,40 @@ make -f ../Makefile
 make -f ../Makefile clean # intermediate files
 make -f ../Makefile distclean # and preseed.cfg
 ```
+
+## Serving preseed.cfg
+
+i wasted a lot of time on this:
+
+[Using preseed](https://wiki.debian.org/DebianInstaller/Preseed) talks about
+
+> put the preconfiguration file in the toplevel directory of the USB stick
+
+but these days the installer creates a read-only iso9660 filesystem on p1 and a very small EFI boot on p2
+which is never mounted into the installer.  their docs really need fixing.
+
+moving on....
+
+the next easiest method is to serve the file over the network.  i chose atftpd because it implements a
+[systemd socket](https://man7.org/linux/man-pages/man5/systemd.socket.5.html) service.
+unfortunately, i also hit [this bug](https://bugs.launchpad.net/ubuntu/+source/atftp/+bug/2065463) so
+implemented the workaround there.
+
+```bash
+sudo -i
+install -d -o $SUDO_USER /srv/tftp
+apt install -y atftpd
+mkdir /etc/systemd/system/atftpd.socket.d
+cat >/etc/systemd/system/atftpd.socket.d/workaround.conf <<'EOF'
+[Socket]
+ListenDatagram=
+ListenDatagram=0.0.0.0:69
+EOF
+systemctl daemon-reload
+exit
+```
+
+copy the `preseed.cfg` to `/srv/tftp`, maybe rename to $TARGET.cfg.
+
+on the target boot the USB and edit options for the installer.  
+append to the `linux` line: `auto url=tftp://$host/$path_to_file` and boot.
