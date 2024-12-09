@@ -22,7 +22,7 @@ preseed.cfg: tmp-transform.cfg ${main_cfg} Makefile
 	sed -n 1p ${main_txt} > $@
 	echo 'd-i passwd/root-password password $${ROOT_PASSWORD}\nd-i passwd/root-password-again password $${ROOT_PASSWORD}' >> $@
 	echo 'd-i passwd/user-password password $${USER_PASSWORD}\nd-i passwd/user-password-again password $${USER_PASSWORD}' >> $@
-	diff ${main_cfg} $< | sed -n '/^> /{s///;p}' >> $@
+	diff ${main_cfg} $< | sed -nE '/ (error|note)$$/d; /^> /{s///;p}' >> $@
 
 .PHONY: clean distclean
 clean:
