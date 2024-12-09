@@ -75,5 +75,5 @@ exit
 
 copy the `preseed.cfg` to `/srv/tftp`, maybe rename to $TARGET.cfg.
 
-on the target boot the USB and edit options for the installer.  
-append to the `linux` line: `auto url=tftp://$host/$path_to_file` and boot.
+on the target boot the USB and choose `Advanced install options...`  / `Graphical Installer...` / `Automated install`.
+when the installer asks for the preseed location, enter `tftp://$host/$path_to_file`.
